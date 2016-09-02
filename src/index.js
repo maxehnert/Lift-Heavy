@@ -1,10 +1,11 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { Router, Route, browserHistory, IndexRoute } from 'react-router'
-import { syncHistoryWithStore, routerReducer } from 'react-router-redux'
+import { syncHistoryWithStore, routerReducer, routerMiddleware } from 'react-router-redux'
 import { createStore, combineReducers } from 'redux'
 import { reducer as formReducer } from 'redux-form'
-
+import throttle from 'lodash/throttle'
+import { loadState, saveState } from './localStorage'
 // import configureStore from './store/configureStore'
 import * as reducers from './Reducers'
 
@@ -19,9 +20,21 @@ const reducer = combineReducers({
   form: formReducer
 })
 
+// TODO: REMOVE DEV TOOLS FROM PROD ANY BUILDS
+const middleware = routerMiddleware(browserHistory)
+const persistedState = loadState()
 const store = createStore(
-  reducer
+  reducer,
+  persistedState,
+  window.devToolsExtension && window.devToolsExtension()
 )
+
+// Save state object to localStorage every second
+store.subscribe(throttle() => {
+  saveState(
+    store.getState()
+  )
+}, 1000)
 
 const history = syncHistoryWithStore(browserHistory, store)
 
