@@ -1,19 +1,37 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { Router, Route, browserHistory, IndexRoute } from 'react-router'
-// import { syncHistoryWithStore } from 'react-router-redux'
-import configureStore from './store/configureStore'
+import { syncHistoryWithStore, routerReducer } from 'react-router-redux'
+import { createStore, combineReducers } from 'redux'
+import { reducer as formReducer } from 'redux-form'
+
+// import configureStore from './store/configureStore'
+import * as reducers from './Reducers'
 
 import App from './App';
 import Home from './Components/Home'
 import Workout from './Components/Workout/Workout'
 import './index.css';
 
+const reducer = combineReducers({
+  ...reducers,
+  routing: routerReducer,
+  form: formReducer
+})
+
+const store = createStore(
+  reducer
+)
+
+const history = syncHistoryWithStore(browserHistory, store)
+
 render((
-  <Router history={browserHistory}>
-    <Route path="/" component={App}>
-      <IndexRoute component={Home} />
-      <Route path="/workout" component={Workout} />
-    </Route>
-  </Router>
+  <Provider store={store}>
+    <Router history={history}>
+      <Route path="/" component={App}>
+        <IndexRoute component={Home} />
+        <Route path="/workout" component={Workout} />
+      </Route>
+    </Router>
+  </Provider>
 ),document.getElementById('root'));
