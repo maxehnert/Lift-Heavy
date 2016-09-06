@@ -1,8 +1,9 @@
 import React from 'react';
 import { render } from 'react-dom';
+import { Provider } from 'react-redux'
+import { createStore, combineReducers } from 'redux'
 import { Router, Route, browserHistory, IndexRoute } from 'react-router'
 import { syncHistoryWithStore, routerReducer } from 'react-router-redux'
-import { createStore, combineReducers } from 'redux'
 import { reducer as formReducer } from 'redux-form'
 
 // import configureStore from './store/configureStore'

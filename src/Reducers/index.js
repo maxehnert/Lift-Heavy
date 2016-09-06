@@ -1,1 +1,3 @@
-export counter from './counterReducer'
+import counter from './counterReducer'
+
+export {counter}
