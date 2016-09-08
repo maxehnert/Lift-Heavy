@@ -3,34 +3,52 @@ import { Field, FieldArray, reduxForm } from 'redux-form'
 import InputField from '../InputField'
 
 const renderLifts = ({ fields }) => (
-  <ul>
-    <li>
-      <button type="button" onClick={() => fields.push({})}>Add Lift</button>
-    </li>
-    {fields.map((lift, index) =>
-      <li key={index}>
-        <button
-          type="button"
-          title="Remove Lift"
-          onClick={() => fields.remove(index)}>X</button>
-        <h4>Lift #{index + 1}</h4>
-        <Field
-          name={`${lift}.name`}
-          type="text"
-          component={InputField}
-          label="Lift Name"/>
-        <Field
-          name={`${lift}.weight`}
-          type="text"
-          component={InputField}
-          label="Weight"/>
-        <FieldArray name={`${lift}.sets`} component={renderHobbies}/>
+  // <div>
+  //   <Field
+  //     name={`${fields}.name`}
+  //     type="text"
+  //     component={InputField}
+  //     label="Workout Name"/>
+    <ul>
+      <li>
+        <button type="button" onClick={() => fields.push({})}>Add Lift</button>
       </li>
-    )}
-  </ul>
+      {fields.map((lift, index) =>
+        <li key={index}>
+          <button
+            type="button"
+            title="Remove Lift"
+            onClick={() => fields.remove(index)}>X</button>
+          <h4>Lift #{index + 1}</h4>
+          <Field
+            name={`${lift}.name`}
+            type="text"
+            component={InputField}
+            label="Lift Name"/>
+          <Field
+            name={`${lift}.weight`}
+            type="text"
+            component={InputField}
+            label="Weight"/>
+          <Field
+            name={`${lift}.setTotal`}
+            type="text"
+            component={InputField}
+            label="Set Count"/>
+          <Field
+            name={`${lift}.repTotal`}
+            type="text"
+            component={InputField}
+            label="Reps"/>
+
+          <FieldArray name={`${lift}.sets`} component={renderSets}/>
+        </li>
+      )}
+    </ul>
+  // </div>
 )
 
-const renderHobbies = ({ fields, meta: { error } }) => (
+const renderSets = ({ fields, meta: { error } }) => (
   <ul>
     <li>
       <button type="button" onClick={() => fields.push()}>Add Set</button>
@@ -55,7 +73,7 @@ const renderHobbies = ({ fields, meta: { error } }) => (
 const singleWorkout = (props) => {
   const { handleSubmit, pristine, reset, submitting } = props
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(submit)}>
       <Field name="workoutName" type="text" component={InputField} label="Workout Name"/>
       <FieldArray name="lifts" component={renderLifts}/>
       <div>
@@ -64,6 +82,11 @@ const singleWorkout = (props) => {
       </div>
     </form>
   )
+}
+
+function submit(values) {
+  console.log(values);
+
 }
 
 export default reduxForm({

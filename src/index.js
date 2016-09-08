@@ -21,7 +21,9 @@ const reducer = combineReducers({
 })
 
 const store = createStore(
-  reducer
+  reducer,
+  window.devToolsExtension && window.devToolsExtension()
+
 )
 
 const history = syncHistoryWithStore(browserHistory, store)
