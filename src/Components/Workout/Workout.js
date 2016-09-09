@@ -1,14 +1,18 @@
 import React from 'react'
 import { Field, FieldArray, reduxForm } from 'redux-form'
 import InputField from '../InputField'
+import { addWorkout, validate } from '../Actions'
+
 
 const renderLifts = ({ fields }) => (
-  // <div>
-  //   <Field
-  //     name={`${fields}.name`}
-  //     type="text"
-  //     component={InputField}
-  //     label="Workout Name"/>
+  <div>
+    {/* {console.log('fields', fields.push({}))} */}
+    <Field
+      // name={fields.insert(0, "workoutName")}
+      name="workoutName"
+      type="text"
+      component={InputField}
+      label="Workout Name"/>
     <ul>
       <li>
         <button type="button" onClick={() => fields.push({})}>Add Lift</button>
@@ -45,10 +49,10 @@ const renderLifts = ({ fields }) => (
         </li>
       )}
     </ul>
-  // </div>
+  </div>
 )
 
-const renderSets = ({ fields, meta: { error } }) => (
+const renderSets = ({ fields }) => (
   <ul>
     <li>
       <button type="button" onClick={() => fields.push()}>Add Set</button>
@@ -66,7 +70,7 @@ const renderSets = ({ fields, meta: { error } }) => (
           label={`Set #${index + 1}`}/>
       </li>
     )}
-    {error && <li className="error">{error}</li>}
+    {/* {error && <li className="error">{error}</li>} */}
   </ul>
 )
 
@@ -74,7 +78,7 @@ const singleWorkout = (props) => {
   const { handleSubmit, pristine, reset, submitting } = props
   return (
     <form onSubmit={handleSubmit(submit)}>
-      <Field name="workoutName" type="text" component={InputField} label="Workout Name"/>
+      {/* <Field name="workoutName" type="text" component={InputField} label="Workout Name"/> */}
       <FieldArray name="lifts" component={renderLifts}/>
       <div>
         <button type="submit" disabled={submitting}>Submit</button>
@@ -84,11 +88,24 @@ const singleWorkout = (props) => {
   )
 }
 
-function submit(values) {
-  console.log(values);
+function submit({ lifts, workoutName }) {
+  console.log('submit stuff', lifts, workoutName);
+
+  // addWorkout(workoutName, lifts)
+
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+    return sleep(1000) // simulate server latency
+      .then(() => {
+          dispatch(addWorkout(workoutName, lifts))
+          window.alert(`You submitted:\n\n${JSON.stringify(workoutName, null, 2)}`)
+
+      })
+
 
 }
 
 export default reduxForm({
-  form: 'singleWorkout'     // a unique identifier for this form
+  form: 'singleWorkout',     // a unique identifier for this form
+  validate
 })(singleWorkout)

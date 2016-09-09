@@ -1,3 +1,4 @@
 import counter from './counterReducer'
+import addWorkout from './workoutReducer'
 
-export {counter}
+export { counter, addWorkout }

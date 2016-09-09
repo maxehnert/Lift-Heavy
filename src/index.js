@@ -26,6 +26,10 @@ const store = createStore(
 
 )
 
+store.subscribe(() => {
+  console.log('Store Changed', store.getState());
+})
+
 const history = syncHistoryWithStore(browserHistory, store)
 
 render((
