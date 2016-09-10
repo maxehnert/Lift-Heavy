@@ -1,5 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
+import { Provider } from 'react-redux'
+import { createStore, combineReducers } from 'redux'
 import { Router, Route, browserHistory, IndexRoute } from 'react-router'
 import { syncHistoryWithStore, routerReducer, routerMiddleware } from 'react-router-redux'
 import { createStore, combineReducers } from 'redux'
@@ -28,6 +30,10 @@ const store = createStore(
   persistedState,
   window.devToolsExtension && window.devToolsExtension()
 )
+
+store.subscribe(() => {
+  console.log('Store Changed', store.getState());
+})
 
 // Save state object to localStorage every second
 store.subscribe(throttle() => {

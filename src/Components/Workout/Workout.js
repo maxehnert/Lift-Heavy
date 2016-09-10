@@ -1,137 +1,111 @@
-import React, { Component, PropTypes } from 'react'
-import { browserHistory } from 'react-router'
-import Counter from './Counter'
+import React from 'react'
+import { Field, FieldArray, reduxForm } from 'redux-form'
+import InputField from '../InputField'
+import { addWorkout, validate } from '../Actions'
 
-import { reduxForm } from 'redux-form'
-export const fields = [ 'firstName', 'lastName', 'email', 'sex', 'favoriteColor', 'employed', 'notes' ]
 
-class Workout extends Component {
-  constructor(props) {
-    super(props)
-  }
+const renderLifts = ({ fields }) => (
+  <div>
+    {/* {console.log('fields', fields.push({}))} */}
+    <Field
+      // name={fields.insert(0, "workoutName")}
+      name="workoutName"
+      type="text"
+      component={InputField}
+      label="Workout Name"/>
+    <ul>
+      <li>
+        <button type="button" onClick={() => fields.push({})}>Add Lift</button>
+      </li>
+      {fields.map((lift, index) =>
+        <li key={index}>
+          <button
+            type="button"
+            title="Remove Lift"
+            onClick={() => fields.remove(index)}>X</button>
+          <h4>Lift #{index + 1}</h4>
+          <Field
+            name={`${lift}.name`}
+            type="text"
+            component={InputField}
+            label="Lift Name"/>
+          <Field
+            name={`${lift}.weight`}
+            type="text"
+            component={InputField}
+            label="Weight"/>
+          <Field
+            name={`${lift}.setTotal`}
+            type="text"
+            component={InputField}
+            label="Set Count"/>
+          <Field
+            name={`${lift}.repTotal`}
+            type="text"
+            component={InputField}
+            label="Reps"/>
 
-  handleChange = (event) => {
-    const name = event.target.name
-    const value = event.target.value
-    this.setState({[name]: value});
-  }
+          <FieldArray name={`${lift}.sets`} component={renderSets}/>
+        </li>
+      )}
+    </ul>
+  </div>
+)
 
-  render() {
-    const {
-     fields: { firstName, lastName, email, sex, favoriteColor, employed, notes },
-     handleSubmit,
-     resetForm,
-     submitting
-     } = this.props
-    return (
+const renderSets = ({ fields }) => (
+  <ul>
+    <li>
+      <button type="button" onClick={() => fields.push()}>Add Set</button>
+    </li>
+    {fields.map((set, index) =>
+      <li key={index}>
+        <button
+          type="button"
+          title="Remove Set"
+          onClick={() => fields.remove(index)}>X</button>
+        <Field
+          name={set}
+          type="text"
+          component={InputField}
+          label={`Set #${index + 1}`}/>
+      </li>
+    )}
+    {/* {error && <li className="error">{error}</li>} */}
+  </ul>
+)
+
+const singleWorkout = (props) => {
+  const { handleSubmit, pristine, reset, submitting } = props
+  return (
+    <form onSubmit={handleSubmit(submit)}>
+      {/* <Field name="workoutName" type="text" component={InputField} label="Workout Name"/> */}
+      <FieldArray name="lifts" component={renderLifts}/>
       <div>
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label>First Name</label>
-            <div>
-              <input type="text" placeholder="First Name" {...firstName}/>
-            </div>
-          </div>
-          <div>
-            <label>Last Name</label>
-            <div>
-              <input type="text" placeholder="Last Name" {...lastName}/>
-            </div>
-          </div>
-          <div>
-            <label>Email</label>
-            <div>
-              <input type="email" placeholder="Email" {...email}/>
-            </div>
-          </div>
-          <div>
-            <label>Sex</label>
-            <div>
-              <label>
-                <input type="radio" {...sex} value="male" checked={sex.value === 'male'}/> Male
-              </label>
-              <label>
-                <input type="radio" {...sex} value="female" checked={sex.value === 'female'}/> Female
-              </label>
-            </div>
-          </div>
-          <div>
-            <label>Favorite Color</label>
-            <div>
-              <select
-                {...favoriteColor}
-                // required syntax for reset form to work
-                // undefined will not change value to first empty option
-                // when resetting
-                value={favoriteColor.value || ''}>
-                <option></option>
-                <option value="ff0000">Red</option>
-                <option value="00ff00">Green</option>
-                <option value="0000ff">Blue</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label>
-              <input type="checkbox" {...employed}/> Employed
-            </label>
-          </div>
-          <div>
-            <label>Notes</label>
-            <div>
-              <textarea
-                {...notes}
-                // required for reset form to work (only on textarea's)
-                // see: https://github.com/facebook/react/issues/2533
-                value={notes.value || ''}/>
-            </div>
-          </div>
-          <div>
-            <button type="submit" disabled={submitting}>
-              {submitting ? <i/> : <i/>} Submit
-            </button>
-            <button type="button" disabled={submitting} onClick={resetForm}>
-              Clear Values
-            </button>
-          </div>
-        </form>
-        <select name="liftName" onChange={this.handleChange}>
-          <option value="deadLift">Dead Lift</option>
-          <option value="squat">Squat</option>
-          <option value="ohp">Over Head Press</option>
-          <option value="flatBench">Flat Bench</option>
-        </select>
-        <input type="text" className="weight-input" onChange={this.handleChange} placeholder="weight" />
-        <div className="increment-weight-container">
-          <button onChange={this.handleChange}>+</button>
-          <button onChange={this.handleChange}>-</button>
-        </div>
-        <div className="lift-set-container">
-          <button onChange={this.handleChange}>+</button>s
-          <div>Rep Count</div>
-          <button onChange={this.handleChange}>-</button>
-        </div>
-        <Counter
-          //value={store.getState()}
-          //onIncrement={() => store.dispatch({ type: 'INCREMENT' })}
-          //onDecrement={() => store.dispatch({ type: 'DECREMENT' })}
-        />
+        <button type="submit" disabled={submitting}>Submit</button>
+        <button type="button" disabled={pristine || submitting} onClick={reset}>Clear Values</button>
       </div>
-    )
-  }
+    </form>
+  )
 }
 
-// export default Workout
+function submit({ lifts, workoutName }) {
+  console.log('submit stuff', lifts, workoutName);
+
+  // addWorkout(workoutName, lifts)
+
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+    return sleep(1000) // simulate server latency
+      .then(() => {
+          dispatch(addWorkout(workoutName, lifts))
+          window.alert(`You submitted:\n\n${JSON.stringify(workoutName, null, 2)}`)
+
+      })
 
 
-Workout.propTypes = {
-  fields: PropTypes.object.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
-  resetForm: PropTypes.func.isRequired,
-  submitting: PropTypes.bool.isRequired
 }
 
 export default reduxForm({
-  form: 'simple',
-  fields
-})(Workout)
+  form: 'singleWorkout',     // a unique identifier for this form
+  validate
+})(singleWorkout)
